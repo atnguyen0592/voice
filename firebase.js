@@ -9,8 +9,8 @@ export const cfg={apiKey: "AIzaSyBZgDQnv1peiX5Ox0EG-BIVLODj1hy-pkY",
   messagingSenderId: "1049806756969",
   appId: "1:1049806756969:web:3847d02b7cdbc5dcd816f8",
   measurementId: "G-Q64X9GFP1C"};
-export const ADMIN_EMAIL="at.huflit@gmail.com";
-export const CLOUDINARY={cloud:"sjgdgqeu",preset:"ATvoice"}; // để trống nếu chỉ dán link
+export const ADMIN_EMAIL="email-google-cua-ban@gmail.com";
+export const CLOUDINARY={cloud:"",preset:""}; // để trống nếu chỉ dán link
 export const app=initializeApp(cfg);
 export const db=getFirestore(app), auth=getAuth(app);
 export const yt=u=>((u||"").match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/)||[])[1];
@@ -20,4 +20,7 @@ export const DEFAULTS={name:"Nguyễn Anh Tú",role:"Voice Talent giọng nam",t
 about:"Giọng nói là linh hồn của mọi sản phẩm truyền thông. Tôi mang đến giọng đọc trầm ấm, giàu cảm xúc và linh hoạt theo từng tone & mood.",
 exp:"TVC/iTVC\nPhim doanh nghiệp\nQuảng cáo phát loa\nThuyết minh phim\nTrailer game\nPodcast",
 skills:"Tư duy ngữ điệu, cảm âm tốt, linh hoạt\nThành thạo Adobe Audition\nMicro chuyên dụng\nStudio chuyên nghiệp\nSẵn sàng thu remote/onsite",
-phone:"0900000000",zalo:"0900000000",email:"email@example.com",facebook:"https://facebook.com/"};
+phone:"0900000000",zalo:"0900000000",email:"email@example.com",facebook:"https://facebook.com/",
+photoShape:"circle",photoX:50,photoY:50,photoZoom:100};
+export const SHAPE_RADIUS={circle:"50%",oval:"50%",rounded:"28px",square:"6px"};
+export const SHAPE_RATIO={oval:"4/5"}; // mặc định các khung còn lại là 1/1 (vuông)
