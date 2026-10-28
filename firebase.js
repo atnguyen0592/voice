@@ -10,7 +10,7 @@ export const cfg={apiKey: "AIzaSyBZgDQnv1peiX5Ox0EG-BIVLODj1hy-pkY",
   appId: "1:1049806756969:web:3847d02b7cdbc5dcd816f8",
   measurementId: "G-Q64X9GFP1C"};
 export const ADMIN_EMAIL="at.huflit@gmail.com";
-export const CLOUDINARY={cloud:"",preset:""}; // để trống nếu chỉ dán link
+export const CLOUDINARY={cloud:"sjgdgqeu",preset:"ATvoice"}; // để trống nếu chỉ dán link
 export const app=initializeApp(cfg);
 export const db=getFirestore(app), auth=getAuth(app);
 export const yt=u=>((u||"").match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/)||[])[1];
