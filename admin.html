@@ -10,38 +10,65 @@ form{display:grid;gap:12px;background:var(--panel);padding:20px;border:1px solid
 label{display:grid;gap:4px;color:var(--mut);font-size:.9rem}
 input,textarea{padding:10px;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:4px;font:inherit}
 .f{display:flex;gap:8px}.f input[type=text]{flex:1}#msg{color:var(--gold2);min-height:1.5em}
+select{padding:10px;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:4px;font:inherit}
+.rg{display:flex;align-items:center;gap:10px}.rg input[type=range]{flex:1;accent-color:var(--gold)}
+.rg output{min-width:3.5em;text-align:right;color:var(--gold2);font-size:.9rem}
+.ppv-wrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:4px}
+.ppv-wrap .pic{margin:0}.ppv-wrap p{color:var(--mut);font-size:.85rem;max-width:260px}
 </style></head><body><div class="wrap">
 <h2 style="margin:0">Quản trị</h2><p id="msg"></p><div id="app"><button class="btn fill" id="in">Đăng nhập bằng Google</button></div></div>
 <script type="module">
-import {db,auth,ADMIN_EMAIL,CLOUDINARY,esc} from "./firebase.js";
+import {db,auth,ADMIN_EMAIL,CLOUDINARY,esc,SHAPE_RADIUS,SHAPE_RATIO} from "./firebase.js";
 import {GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {collection,getDocs,addDoc,setDoc,updateDoc,deleteDoc,doc,getDoc} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const $=s=>document.querySelector(s), say=t=>($("#msg").textContent=t);
 const T={
- profile:{n:"Hồ sơ",f:[["name","Họ tên"],["role","Vai trò ngắn gọn (hiện dưới tên, vd: Voice Talent giọng nam)"],["tagline","Mô tả ngắn (hiện trong banner)"],["about","Giới thiệu","a"],["photo","Ảnh chân dung","u"],["phone","Số điện thoại"],["zalo","Số Zalo"],["email","Email"],["facebook","Link Facebook"],["exp","Kinh nghiệm (mỗi dòng một mục)","a"],["skills","Kỹ năng - Thiết bị (mỗi dòng một mục)","a"]]},
+ profile:{n:"Hồ sơ",f:[["name","Họ tên"],["role","Vai trò ngắn gọn (hiện dưới tên, vd: Voice Talent giọng nam)"],["tagline","Mô tả ngắn (hiện trong banner)"],["about","Giới thiệu","a"],
+ ["photo","Ảnh chân dung","u"],
+ ["photoShape","Khung ảnh","s",[["circle","Tròn"],["square","Vuông"],["rounded","Vuông bo góc"],["oval","Oval đứng"]]],
+ ["photoX","Vị trí ngang trong khung","r",[0,100,1,"%"]],
+ ["photoY","Vị trí dọc trong khung (giảm để lộ thêm phần tóc/đầu)","r",[0,100,1,"%"]],
+ ["photoZoom","Phóng to / thu nhỏ ảnh","r",[70,200,5,"%"]],
+ ["phone","Số điện thoại"],["zalo","Số Zalo"],["email","Email"],["facebook","Link Facebook"],["exp","Kinh nghiệm (mỗi dòng một mục)","a"],["skills","Kỹ năng - Thiết bị (mỗi dòng một mục)","a"]]},
  samples:{n:"Sample",f:[["title","Tiêu đề"],["brand","Nhãn hàng"],["category","Nhóm (vd: Trầm ấm, Game, Mẹ và bé)"],["url","Link YouTube / mp3 / mp4","u"],["cover","Ảnh bìa (bỏ trống nếu là YouTube)","u"]],row:d=>`${d.title} — ${d.brand||""} [${d.category||""}]`},
  brands:{n:"Nhãn hàng",f:[["name","Tên nhãn hàng"],["logo","Logo","u"]],row:d=>d.name}};
-let tab="profile",items=[];
+let tab="profile",items=[],profileLoaded={};
 async function upload(file){
  if(!CLOUDINARY.cloud)throw Error("Chưa cấu hình Cloudinary trong firebase.js");
  const fd=new FormData();fd.append("file",file);fd.append("upload_preset",CLOUDINARY.preset);
  const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloud}/auto/upload`,{method:"POST",body:fd});
  const j=await r.json();if(!j.secure_url)throw Error(j.error?.message||"Tải lên thất bại");return j.secure_url}
+const PDEF={photoShape:"circle",photoX:50,photoY:50,photoZoom:100};
 function form(c,d={},id){
- const fs=T[c].f.map(([k,l,t])=>`<label>${l}${t=="a"?`<textarea name="${k}" rows="4">${esc(d[k])}</textarea>`:
- `<span class="f"><input type="text" name="${k}" value="${esc(d[k])}">${t=="u"?`<input type="file" data-for="${k}" accept="image/*,audio/*,video/*">`:""}</span>`}</label>`).join("");
- return `<form id="fm" data-c="${c}" data-id="${id||""}">${fs}<div class="f"><button class="btn fill">Lưu</button>${c!="profile"?`<button type="button" class="btn" id="cancel">Hủy</button>`:""}</div></form>`}
+ const fs=T[c].f.map(([k,l,t,extra])=>{
+  const v=d[k]??PDEF[k]??"";
+  if(t=="a")return `<label>${l}<textarea name="${k}" rows="4">${esc(v)}</textarea></label>`;
+  if(t=="s")return `<label>${l}<select name="${k}">${extra.map(([val,lb])=>`<option value="${val}"${val==v?" selected":""}>${lb}</option>`).join("")}</select></label>`;
+  if(t=="r"){const[lo,hi,step,unit]=extra;return `<label>${l}<span class="rg"><input type="range" name="${k}" min="${lo}" max="${hi}" step="${step}" value="${v}" data-unit="${unit}"><output>${v}${unit}</output></span></label>`}
+  return `<label>${l}<span class="f"><input type="text" name="${k}" value="${esc(v)}">${t=="u"?`<input type="file" data-for="${k}" accept="image/*,audio/*,video/*">`:""}</span></label>`}).join("");
+ const preview=c=="profile"?`<div class="ppv-wrap"><div class="pic" id="pvPic"><div class="frame"><img id="pvImg" src="${esc(d.photo||"")}"></div></div>
+ <p>Xem trước khung ảnh — thay đổi khi bạn chỉnh khung, vị trí, phóng to hoặc tải ảnh mới. Nhớ bấm <b>Lưu</b> để áp dụng lên website.</p></div>`:"";
+ return `<form id="fm" data-c="${c}" data-id="${id||""}">${preview}${fs}<div class="f"><button class="btn fill">Lưu</button>${c!="profile"?`<button type="button" class="btn" id="cancel">Hủy</button>`:""}</div></form>`}
+function updatePreview(f){
+ const pv=f.querySelector("#pvPic");if(!pv)return;
+ const v=Object.fromEntries(new FormData(f));
+ pv.style.borderRadius=SHAPE_RADIUS[v.photoShape]||"50%";
+ pv.style.aspectRatio=SHAPE_RATIO[v.photoShape]||"1/1";
+ const img=f.querySelector("#pvImg");
+ if(v.photo)img.src=v.photo;
+ img.style.objectPosition=`${v.photoX||50}% ${v.photoY||50}%`;
+ img.style.transform=`scale(${(v.photoZoom||100)/100})`}
 async function render(){
  const bar=Object.keys(T).map(k=>`<button class="btn${k==tab?" fill":""}" data-t="${k}">${T[k].n}</button>`).join("");
  let h=`<div class="bar">${bar}<button class="btn" id="out" style="margin-left:auto">Đăng xuất</button><a class="btn" href="index.html" target="_blank">Xem website</a></div>`;
- if(tab=="profile"){const d=(await getDoc(doc(db,"site","profile"))).data()||{};h+=form("profile",d)}
+ if(tab=="profile"){const d=(await getDoc(doc(db,"site","profile"))).data()||{};h+=form("profile",d);profileLoaded=d}
  else{
   items=(await getDocs(collection(db,tab))).docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
   h+=`<button class="btn fill" data-a="new">+ Thêm ${T[tab].n.toLowerCase()}</button><div id="ed"></div><div style="margin-top:16px">`+
   items.map((d,i)=>`<div class="row${d.visible?"":" off"}" data-id="${d.id}" data-i="${i}"><b>${esc(T[tab].row(d))}</b>
   <button class="btn" data-a="up" title="Lên">↑</button><button class="btn" data-a="dn" title="Xuống">↓</button>
   <button class="btn" data-a="eye">${d.visible?"Đang hiện":"Đang ẩn"}</button><button class="btn" data-a="edit">Sửa</button><button class="btn" data-a="del">Xóa</button></div>`).join("")+`</div>`}
- $("#app").innerHTML=h}
+ $("#app").innerHTML=h;const fm=$("#fm");if(fm&&fm.dataset.c=="profile")updatePreview(fm)}
 $("#app").addEventListener("click",async e=>{
  const b=e.target.closest("button");if(!b)return;
  try{
@@ -59,12 +86,17 @@ $("#app").addEventListener("click",async e=>{
   [items[i],items[j]]=[items[j],items[i]];
   await Promise.all(items.map((x,n)=>updateDoc(doc(db,tab,x.id),{order:n})));render()}
  }catch(err){say("Lỗi: "+err.message)}});
+$("#app").addEventListener("input",e=>{
+ const t=e.target;
+ if(t.matches('input[type=range]'))t.nextElementSibling.textContent=t.value+(t.dataset.unit||"");
+ const f=t.closest("form");if(f&&f.dataset.c=="profile")updatePreview(f)});
 $("#app").addEventListener("change",async e=>{
  const f=e.target;if(!f.dataset.for||!f.files[0])return;
- try{say("Đang tải lên...");f.form.elements[f.dataset.for].value=await upload(f.files[0]);say("Đã tải lên. Nhớ bấm Lưu.")}catch(err){say("Lỗi: "+err.message)}});
+ try{say("Đang tải lên...");f.form.elements[f.dataset.for].value=await upload(f.files[0]);say("Đã tải lên. Nhớ bấm Lưu.");updatePreview(f.form)}catch(err){say("Lỗi: "+err.message)}});
 $("#app").addEventListener("submit",async e=>{
  e.preventDefault();const f=e.target,c=f.dataset.c,data={};
- new FormData(f).forEach((v,k)=>{if(typeof v=="string")data[k]=v.trim()});
+ const NUM=["photoX","photoY","photoZoom","order"];
+ new FormData(f).forEach((v,k)=>{if(typeof v=="string")data[k]=NUM.includes(k)?Number(v):v.trim()});
  try{
   if(c=="profile")await setDoc(doc(db,"site","profile"),data,{merge:true});
   else if(f.dataset.id)await updateDoc(doc(db,c,f.dataset.id),data);
