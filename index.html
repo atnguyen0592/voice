@@ -46,7 +46,7 @@
 <section id="contact"><div class="wrap"><h2><svg class="i"><use href="#i-phone"/></svg>Liên hệ</h2><div class="contact" id="ct"></div></div></section>
 <footer>© <span id="yr"></span> <span id="fn">Nguyễn Anh Tú</span> - Voice Talent</footer>
 <script type="module">
-import {db,yt,esc,DEFAULTS,SHAPE_RADIUS,SHAPE_RATIO} from "./firebase.js";
+import {db,yt,esc,DEFAULTS,SHAPE_RADIUS,SHAPE_RATIO,gdriveId} from "./firebase.js";
 import {collection,getDocs,query,where,doc,getDoc} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const $=s=>document.querySelector(s), ord=(a,b)=>(a.order||0)-(b.order||0);
 const load=async c=>(await getDocs(query(collection(db,c),where("visible","==",true)))).docs.map(d=>({id:d.id,...d.data()})).sort(ord);
@@ -60,8 +60,14 @@ document.title=p.name+" | Voice Talent";
 for(const id of ["name","nb","fn"])$("#"+id).textContent=p.name;
 $("#role").textContent=p.role;$("#tag").textContent=p.tagline;$("#about-t").textContent=p.about;$("#exp").innerHTML=lines(p.exp);$("#skills").innerHTML=lines(p.skills);
 if(p.photo){$("#photo").src=p.photo;$("#photo").hidden=false;$("#ph").hidden=true}
-$("#pic").style.borderRadius=SHAPE_RADIUS[p.photoShape]||"50%";
-$("#pic").style.aspectRatio=SHAPE_RATIO[p.photoShape]||"1/1";
+if(p.photoStyle=="glass"){
+ $("#pic").classList.add("glass");
+ $("#pic").style.borderRadius="18px";
+ $("#pic").style.aspectRatio="3/4";
+}else{
+ $("#pic").style.borderRadius=SHAPE_RADIUS[p.photoShape]||"50%";
+ $("#pic").style.aspectRatio=SHAPE_RATIO[p.photoShape]||"1/1";
+}
 $("#photo").style.objectPosition=`${p.photoX??50}% ${p.photoY??50}%`;
 $("#photo").style.transform=`scale(${(p.photoZoom||100)/100})`;
 const tel=String(p.phone).replace(/\s|\./g,"");
@@ -70,16 +76,21 @@ $("#ct").innerHTML=L.filter(x=>x[3]).map(x=>`<a class="ct" href="${esc(x[1])}" $
 let B=[];try{B=await load("brands")}catch(e){console.warn(e)}
 if(B.length){
  const h=B.map(x=>x.logo?
-  `<div class="bitem"><div class="blogo"><img src="${esc(x.logo)}" alt="${esc(x.name)}" loading="lazy"></div></div>`:
+  `<div class="bitem"><div class="blogo"><img src="${esc(x.logo)}" alt="${esc(x.name)}"></div></div>`:
   `<div class="bitem noimg"><span class="bname">${esc(x.name)}</span></div>`).join("");
  $("#brandsSec").hidden=false;
  const track=document.querySelector("#brands div");
+ const waitImgs=root=>Promise.all([...root.querySelectorAll("img")].map(im=>
+  im.complete?Promise.resolve():new Promise(res=>{im.onload=im.onerror=res})));
  track.innerHTML=h;
- requestAnimationFrame(()=>{
-  const setW=track.scrollWidth||1,target=Math.max(window.innerWidth*2.2,1200);
-  let reps=2;while(reps*setW<target)reps+=2;
-  track.innerHTML=h.repeat(reps);
- });
+ await waitImgs(track);
+ const setW=track.scrollWidth||1,target=Math.max(window.innerWidth*2.2,1200);
+ let reps=2;while(reps*setW<target)reps+=2;
+ track.innerHTML=h.repeat(reps);
+ await waitImgs(track);
+ const totalW=track.scrollWidth||1,half=totalW/2,SPEED=55; // tốc độ cố định: 55px/giây
+ track.style.setProperty("--mw",half+"px");
+ track.style.animationDuration=(half/SPEED)+"s";
 }
 let S=[],cat="",kw="";
 try{S=await load("samples")}catch(e){console.warn(e)}
@@ -87,12 +98,13 @@ if(!S.length)S=[["Trầm ấm - truyền cảm","Sample mẫu 1"],["Mạnh mẽ 
 const cats=[...new Set(S.map(s=>s.category).filter(Boolean))];
 $("#chips").insertAdjacentHTML("afterbegin",["Tất cả",...cats].map((c,i)=>`<button class="chip${i?"":" on"}" data-c="${i?esc(c):""}">${esc(c)}</button>`).join(""));
 function card(s){
- const id=yt(s.url),cv=s.cover||(id?`https://i.ytimg.com/vi/${id}/hqdefault.jpg`:"");
+ const id=yt(s.url),gd=gdriveId(s.url),cv=s.cover||(id?`https://i.ytimg.com/vi/${id}/hqdefault.jpg`:"");
  let m;
  if(id)m=`<div class="media" data-yt="${id}" role="button" tabindex="0" aria-label="Phát ${esc(s.title)}" style="background-image:url('${esc(cv)}')"><span class="play"><svg class="i f"><use href="#i-play"/></svg></span></div>`;
- else if(/\.(mp3|wav|m4a|ogg)(\?|$)/i.test(s.url))m=`<div class="audio">${ic("hp")}<audio controls preload="none" src="${esc(s.url)}"></audio></div>`;
- else if(/\.(mp4|webm)(\?|$)/i.test(s.url))m=`<video controls preload="none" poster="${esc(cv)}" src="${esc(s.url)}"></video>`;
- else m=`<a class="media" href="${esc(s.url)}" target="_blank" rel="noopener" style="background-image:url('${esc(cv)}')"><span class="play"><svg class="i f"><use href="#i-play"/></svg></span></a>`;
+ else if(gd)m=`<div class="media"><iframe src="https://drive.google.com/file/d/${gd}/preview" allow="autoplay" allowfullscreen></iframe></div>`;
+ else if(/\.(mp4|webm|mov)(\?|$)/i.test(s.url))m=`<video controls preload="none" poster="${esc(cv)}" src="${esc(s.url)}"></video>`;
+ else if(/\.(mp3|wav|m4a|ogg|aac|flac)(\?|$)/i.test(s.url))m=`<div class="audio">${ic("hp")}<audio controls preload="none" src="${esc(s.url)}"></audio></div>`;
+ else m=`<div class="audio guess">${ic("hp")}<audio controls preload="none" src="${esc(s.url)}" data-url="${esc(s.url)}" data-cover="${esc(cv)}"></audio></div>`;
  return `<article class="card">${m}<h3>${esc(s.title)}</h3><small>${esc([s.brand,s.category].filter(Boolean).join(" • "))}</small></article>`}
 function draw(){
  const r=S.filter(s=>(!cat||s.category===cat)&&(s.title+" "+(s.brand||"")).toLowerCase().includes(kw));
@@ -103,4 +115,10 @@ $("#q").oninput=e=>{kw=e.target.value.toLowerCase();draw()};
 const go=e=>{const m=e.target.closest("[data-yt]");if(m&&(e.type=="click"||e.key=="Enter"))m.outerHTML=`<div class="media"><iframe src="https://www.youtube.com/embed/${m.dataset.yt}?autoplay=1" allow="autoplay;encrypted-media" allowfullscreen></iframe></div>`};
 $("#grid").onclick=go;$("#grid").onkeydown=go;
 document.addEventListener("play",e=>document.querySelectorAll("audio,video").forEach(m=>m!==e.target&&m.pause()),true);
+document.addEventListener("error",e=>{
+ const wrap=e.target.tagName=="AUDIO"&&e.target.closest(".audio.guess");
+ if(!wrap)return;
+ const url=e.target.dataset.url||"",cover=e.target.dataset.cover||"";
+ wrap.outerHTML=`<a class="media" href="${esc(url)}" target="_blank" rel="noopener" style="background-image:url('${esc(cover)}')"><span class="play"><svg class="i f"><use href="#i-play"/></svg></span></a>`;
+},true);
 </script></body></html>
