@@ -29,6 +29,15 @@ nav a:hover{background:var(--panel);color:var(--gold2)}
 .pic{border:1px solid var(--gold);padding:8px;border-radius:50%;max-width:260px;aspect-ratio:1/1;justify-self:end;width:100%;transition:border-radius .2s,aspect-ratio .2s}
 .pic .frame{width:100%;height:100%;overflow:hidden;border-radius:inherit;background:var(--panel)}
 .pic .frame img{width:100%;height:100%;object-fit:cover;display:block;object-position:50% 50%}
+.pic.glass{border:0;padding:0;background:
+ radial-gradient(circle at 22% 18%,rgba(232,200,135,.6),transparent 52%),
+ radial-gradient(circle at 78% 12%,rgba(255,244,222,.3),transparent 42%),
+ radial-gradient(circle at 65% 78%,rgba(201,154,82,.45),transparent 58%),
+ var(--bg2)}
+.pic.glass .frame{background:none}
+.pic.glass .frame img{
+ -webkit-mask-image:linear-gradient(to bottom,#000 56%,transparent 97%);
+ mask-image:linear-gradient(to bottom,#000 56%,transparent 97%)}
 .pic .ph{width:100%;height:100%;display:grid;place-items:center;color:var(--gold)}
 .pic .ph .i{width:35%;height:35%}
 .pic [hidden]{display:none!important}
@@ -41,12 +50,12 @@ nav a:hover{background:var(--panel);color:var(--gold2)}
 .marq div{display:flex;gap:46px;width:max-content;animation:m 40s linear infinite;align-items:center}
 .marq:hover div{animation-play-state:paused}
 .bitem{flex:none;display:flex;align-items:center;justify-content:center}
-.blogo{height:66px;display:flex;align-items:center;justify-content:center;transition:transform .2s}
-.bitem:hover .blogo{transform:scale(1.07)}
+.blogo{height:66px;padding:10px 18px;border-radius:14px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;transition:transform .2s,border-color .2s,box-shadow .2s}
+.bitem:hover .blogo{transform:scale(1.07);border-color:var(--gold2);box-shadow:0 0 10px rgba(232,200,135,.95),0 0 22px rgba(232,200,135,.65),0 0 40px rgba(201,154,82,.45)}
 .blogo img{max-height:100%;max-width:200px;width:auto;height:auto;object-fit:contain;display:block;filter:drop-shadow(0 3px 10px rgba(0,0,0,.5)) saturate(1.1) contrast(1.05) brightness(1.03)}
 .bname{font-size:.82rem;color:var(--mut);white-space:nowrap}
 .bitem.noimg .bname{font:700 1.05rem "Playfair Display",serif;color:var(--gold2);white-space:normal;max-width:180px;line-height:1.3;text-align:center}
-@keyframes m{to{transform:translateX(-50%)}}
+@keyframes m{to{transform:translateX(calc(-1 * var(--mw, 50%)))}}
 section{padding:72px 0;border-bottom:1px solid var(--line)}section:nth-of-type(even){background:var(--bg2)}
 h2{font-size:clamp(1.8rem,4vw,2.5rem);margin-bottom:32px;color:var(--gold2);display:flex;align-items:center;gap:14px}
 h2:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
