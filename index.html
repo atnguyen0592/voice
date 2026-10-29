@@ -69,16 +69,20 @@ const L=[["phone","tel:"+tel,"Gọi điện",p.phone],["chat","https://zalo.me/"
 $("#ct").innerHTML=L.filter(x=>x[3]).map(x=>`<a class="ct" href="${esc(x[1])}" ${x[0]=="fb"?'target="_blank" rel="noopener"':""} aria-label="${esc(x[2])}: ${esc(x[3])}">${ic(x[0])}<span>${x[2]}</span></a>`).join("");
 let B=[];try{B=await load("brands")}catch(e){console.warn(e)}
 if(B.length){
- const h=B.map(x=>`<div class="bitem">
-  <div class="blogo">${x.logo?`<img src="${esc(x.logo)}" alt="${esc(x.name)}" loading="lazy">`:`<span>${esc((x.name||"?").trim()[0]||"?")}</span>`}</div>
-  <span class="bname">${esc(x.name)}</span></div>`).join("");
+ const h=B.map(x=>x.logo?
+  `<div class="bitem"><div class="blogo"><img src="${esc(x.logo)}" alt="${esc(x.name)}" loading="lazy"></div><span class="bname">${esc(x.name)}</span></div>`:
+  `<div class="bitem noimg"><span class="bname">${esc(x.name)}</span></div>`).join("");
  $("#brandsSec").hidden=false;
  const track=document.querySelector("#brands div");
+ const shapeLogos=root=>root.querySelectorAll(".blogo img").forEach(img=>{
+  const apply=()=>{const r=img.naturalWidth/(img.naturalHeight||1);img.closest(".blogo").classList.toggle("oval",r>1.3)};
+  img.complete?apply():img.addEventListener("load",apply,{once:true})});
  track.innerHTML=h;
  requestAnimationFrame(()=>{
   const setW=track.scrollWidth||1,target=Math.max(window.innerWidth*2.2,1200);
   let reps=2;while(reps*setW<target)reps+=2;
   track.innerHTML=h.repeat(reps);
+  shapeLogos(track);
  });
 }
 let S=[],cat="",kw="";
