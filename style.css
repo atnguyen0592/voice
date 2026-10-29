@@ -20,12 +20,13 @@ nav a:hover{background:var(--panel);color:var(--gold2)}
 .wave i{flex:1;background:linear-gradient(var(--gold2),var(--gold));border-radius:3px 3px 0 0;height:var(--h);animation:w 2.4s ease-in-out infinite alternate;animation-delay:var(--d)}
 @keyframes w{to{transform:scaleY(.35);transform-origin:bottom}}
 .hero .wrap{position:relative}
-.hero h1{white-space:nowrap;text-align:center;font-size:clamp(1.9rem,8.4vw,6rem);padding-bottom:.1em;background:linear-gradient(120deg,var(--gold2),var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.role{display:flex;justify-content:center;align-items:center;gap:12px;color:var(--gold);margin:8px 0 40px}
-.role:before,.role:after{content:"";height:1px;width:min(18vw,140px);background:var(--gold)}
-.hgrid{display:grid;grid-template-columns:1.2fr 1fr;gap:44px;align-items:center}
-.hero p{color:var(--mut);margin-bottom:26px;font-size:1.1rem;max-width:48ch}.hero .acts{display:flex;flex-wrap:wrap;gap:12px}
-.pic{border:1px solid var(--gold);padding:10px;border-radius:50%;max-width:320px;aspect-ratio:1/1;justify-self:center;width:100%;transition:border-radius .2s,aspect-ratio .2s}
+.hgrid{display:grid;grid-template-columns:1.3fr 1fr;gap:36px;align-items:start}
+.htext{min-width:0}
+.hero h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(1.7rem,5.6vw,4.2rem);padding-bottom:.12em;background:linear-gradient(120deg,var(--gold2),var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.role{display:flex;align-items:center;gap:10px;color:var(--gold);margin:6px 0 22px;font-size:1.05rem}
+.role:after{content:"";height:1px;flex:1;max-width:120px;background:var(--gold)}
+.hero p{color:var(--mut);margin-bottom:26px;font-size:1.05rem;max-width:48ch}.hero .acts{display:flex;flex-wrap:wrap;gap:12px}
+.pic{border:1px solid var(--gold);padding:8px;border-radius:50%;max-width:260px;aspect-ratio:1/1;justify-self:end;width:100%;transition:border-radius .2s,aspect-ratio .2s}
 .pic .frame{width:100%;height:100%;overflow:hidden;border-radius:inherit;background:var(--panel)}
 .pic .frame img{width:100%;height:100%;object-fit:cover;display:block;object-position:50% 50%}
 .pic .ph{width:100%;height:100%;display:grid;place-items:center;color:var(--gold)}
@@ -70,5 +71,8 @@ h2 .i{width:1.1em;height:1.1em;padding:8px;box-sizing:content-box;border:1px sol
 .ct .i{width:26px;height:26px;padding:12px;box-sizing:content-box;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a1108}
 .ct small{display:block;color:var(--mut)}.ct span{overflow-wrap:anywhere}
 footer{padding:28px;text-align:center;color:var(--mut)}
-@media(max-width:760px){.hgrid,.two{grid-template-columns:1fr}.sb{margin:0;width:100%}.sb input{width:100%}nav a span{display:none}}
+@media(max-width:760px){.hgrid,.two{grid-template-columns:1fr}.sb{margin:0;width:100%}.sb input{width:100%}nav a span{display:none}
+.hgrid{justify-items:center;text-align:center}.hgrid .pic{order:-1;justify-self:center;margin-bottom:12px}
+.htext{text-align:center}.role{justify-content:center}.role:after{display:none}.hero .acts{justify-content:center}
+.hero h1{white-space:normal;font-size:clamp(1.9rem,9vw,3.4rem)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
