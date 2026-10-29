@@ -70,7 +70,7 @@ $("#ct").innerHTML=L.filter(x=>x[3]).map(x=>`<a class="ct" href="${esc(x[1])}" $
 let B=[];try{B=await load("brands")}catch(e){console.warn(e)}
 if(B.length){
  const h=B.map(x=>x.logo?
-  `<div class="bitem"><div class="blogo"><img src="${esc(x.logo)}" alt="${esc(x.name)}" loading="lazy"></div><span class="bname">${esc(x.name)}</span></div>`:
+  `<div class="bitem"><div class="blogo"><img src="${esc(x.logo)}" alt="${esc(x.name)}" loading="lazy"></div></div>`:
   `<div class="bitem noimg"><span class="bname">${esc(x.name)}</span></div>`).join("");
  $("#brandsSec").hidden=false;
  const track=document.querySelector("#brands div");
