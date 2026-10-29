@@ -29,15 +29,16 @@ nav a:hover{background:var(--panel);color:var(--gold2)}
 .pic{border:1px solid var(--gold);padding:8px;border-radius:50%;max-width:260px;aspect-ratio:1/1;justify-self:end;width:100%;transition:border-radius .2s,aspect-ratio .2s}
 .pic .frame{width:100%;height:100%;overflow:hidden;border-radius:inherit;background:var(--panel)}
 .pic .frame img{width:100%;height:100%;object-fit:cover;display:block;object-position:50% 50%}
-.pic.glass{border:0;padding:0;background:
- radial-gradient(circle at 22% 18%,rgba(232,200,135,.6),transparent 52%),
- radial-gradient(circle at 78% 12%,rgba(255,244,222,.3),transparent 42%),
- radial-gradient(circle at 65% 78%,rgba(201,154,82,.45),transparent 58%),
- var(--bg2)}
+.pic.glass{border:0;padding:0;background:none;max-width:300px;position:relative;isolation:isolate}
+.pic.glass:before{content:"";position:absolute;inset:-18%;z-index:-1;border-radius:inherit;
+ background:
+  radial-gradient(circle at 32% 24%,rgba(232,200,135,.4),transparent 56%),
+  radial-gradient(circle at 70% 72%,rgba(201,154,82,.3),transparent 62%);
+ filter:blur(32px)}
 .pic.glass .frame{background:none}
 .pic.glass .frame img{
- -webkit-mask-image:linear-gradient(to bottom,#000 56%,transparent 97%);
- mask-image:linear-gradient(to bottom,#000 56%,transparent 97%)}
+ -webkit-mask-image:radial-gradient(ellipse 74% 80% at 50% 42%,#000 60%,transparent 100%);
+ mask-image:radial-gradient(ellipse 74% 80% at 50% 42%,#000 60%,transparent 100%)}
 .pic .ph{width:100%;height:100%;display:grid;place-items:center;color:var(--gold)}
 .pic .ph .i{width:35%;height:35%}
 .pic [hidden]{display:none!important}
