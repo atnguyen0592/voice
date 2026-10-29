@@ -35,7 +35,6 @@
 <a class="btn" href="#contact"><svg class="i"><use href="#i-send"/></svg>Liên hệ ngay</a></div></div>
 <div class="pic" id="pic"><div class="frame"><img id="photo" alt="Nguyễn Anh Tú" hidden><div class="ph" id="ph"><svg class="i"><use href="#i-user"/></svg></div></div></div>
 </div></div></header>
-<div class="stats"><div><b id="s1">0</b><span>Voice samples</span></div><div><b id="s2">0</b><span>Đơn vị đã hợp tác</span></div><div><b id="s3">0</b><span>Tone & lĩnh vực</span></div></div>
 <div class="marq" id="brands" hidden><div></div></div>
 <section id="samples"><div class="wrap"><h2><svg class="i"><use href="#i-hp"/></svg>Voice samples</h2>
 <div class="tools" id="chips"><label class="sb"><svg class="i"><use href="#i-find"/></svg><input id="q" placeholder="Tìm sample..." aria-label="Tìm sample"></label></div>
@@ -69,14 +68,15 @@ const L=[["phone","tel:"+tel,"Gọi điện",p.phone],["chat","https://zalo.me/"
 $("#ct").innerHTML=L.filter(x=>x[3]).map(x=>`<a class="ct" href="${esc(x[1])}" ${x[0]=="fb"?'target="_blank" rel="noopener"':""} aria-label="${esc(x[2])}: ${esc(x[3])}">${ic(x[0])}<span>${x[2]}</span></a>`).join("");
 let B=[];try{B=await load("brands")}catch(e){console.warn(e)}
 if(B.length){
- const h=B.map(x=>x.logo?`<img src="${esc(x.logo)}" alt="${esc(x.name)}" loading="lazy">`:`<span class="bname">${esc(x.name)}</span>`).join("");
+ const h=B.map(x=>`<div class="bitem">
+  <div class="blogo">${x.logo?`<img src="${esc(x.logo)}" alt="${esc(x.name)}" loading="lazy">`:`<span>${esc((x.name||"?").trim()[0]||"?")}</span>`}</div>
+  <span class="bname">${esc(x.name)}</span></div>`).join("");
  $("#brands").hidden=false;$("#brands div").innerHTML=h+h
 }
 let S=[],cat="",kw="";
 try{S=await load("samples")}catch(e){console.warn(e)}
 if(!S.length)S=[["Trầm ấm - truyền cảm","Sample mẫu 1"],["Mạnh mẽ - hùng tráng","Sample mẫu 2"],["Game","Sample mẫu 3"]].map(([category,title])=>({category,title,brand:"Thay bằng nội dung thật trong Admin",url:"#"}));
-$("#s1").textContent=S.length;$("#s2").textContent=B.length;
-const cats=[...new Set(S.map(s=>s.category).filter(Boolean))];$("#s3").textContent=cats.length;
+const cats=[...new Set(S.map(s=>s.category).filter(Boolean))];
 $("#chips").insertAdjacentHTML("afterbegin",["Tất cả",...cats].map((c,i)=>`<button class="chip${i?"":" on"}" data-c="${i?esc(c):""}">${esc(c)}</button>`).join(""));
 function card(s){
  const id=yt(s.url),cv=s.cover||(id?`https://i.ytimg.com/vi/${id}/hqdefault.jpg`:"");
