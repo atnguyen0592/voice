@@ -45,7 +45,7 @@ function form(c,d={},id){
   if(t=="a")return `<label>${l}<textarea name="${k}" rows="4">${esc(v)}</textarea></label>`;
   if(t=="s")return `<label>${l}<select name="${k}">${extra.map(([val,lb])=>`<option value="${val}"${val==v?" selected":""}>${lb}</option>`).join("")}</select></label>`;
   if(t=="r"){const[lo,hi,step,unit]=extra;return `<label>${l}<span class="rg"><input type="range" name="${k}" min="${lo}" max="${hi}" step="${step}" value="${v}" data-unit="${unit}"><output>${v}${unit}</output></span></label>`}
-  return `<label>${l}<span class="f"><input type="text" name="${k}" value="${esc(v)}">${t=="u"?`<input type="file" data-for="${k}" accept="image/*,audio/*,video/*">`:""}</span></label>`}).join("");
+  return `<label>${l}<span class="f"><input type="text" name="${k}" value="${esc(v)}" placeholder="${t=="u"?"https://... (dán link ảnh trực tiếp)":""}">${t=="u"?`<input type="file" data-for="${k}" accept="image/*,audio/*,video/*">`:""}</span></label>`}).join("");
  const preview=c=="profile"?`<div class="ppv-wrap"><div class="pic" id="pvPic"><div class="frame"><img id="pvImg" src="${esc(d.photo||"")}"></div></div>
  <p>Xem trước khung ảnh — thay đổi khi bạn chỉnh khung, vị trí, phóng to hoặc tải ảnh mới. Nhớ bấm <b>Lưu</b> để áp dụng lên website.</p></div>`:"";
  return `<form id="fm" data-c="${c}" data-id="${id||""}">${preview}${fs}<div class="f"><button class="btn fill">Lưu</button>${c!="profile"?`<button type="button" class="btn" id="cancel">Hủy</button>`:""}</div></form>`}
