@@ -35,7 +35,8 @@
 <a class="btn" href="#contact"><svg class="i"><use href="#i-send"/></svg>Liên hệ ngay</a></div></div>
 <div class="pic" id="pic"><div class="frame"><img id="photo" alt="Nguyễn Anh Tú" hidden><div class="ph" id="ph"><svg class="i"><use href="#i-user"/></svg></div></div></div>
 </div></div></header>
-<div class="marq" id="brands" hidden><div></div></div>
+<div class="brandsec" id="brandsSec" hidden><div class="wrap"><h2><svg class="i"><use href="#i-job"/></svg>Đơn vị đã hợp tác</h2></div>
+<div class="marq" id="brands"><div></div></div></div>
 <section id="samples"><div class="wrap"><h2><svg class="i"><use href="#i-hp"/></svg>Voice samples</h2>
 <div class="tools" id="chips"><label class="sb"><svg class="i"><use href="#i-find"/></svg><input id="q" placeholder="Tìm sample..." aria-label="Tìm sample"></label></div>
 <div class="grid" id="grid"></div></div></section>
@@ -71,7 +72,14 @@ if(B.length){
  const h=B.map(x=>`<div class="bitem">
   <div class="blogo">${x.logo?`<img src="${esc(x.logo)}" alt="${esc(x.name)}" loading="lazy">`:`<span>${esc((x.name||"?").trim()[0]||"?")}</span>`}</div>
   <span class="bname">${esc(x.name)}</span></div>`).join("");
- $("#brands").hidden=false;$("#brands div").innerHTML=h+h
+ $("#brandsSec").hidden=false;
+ const track=document.querySelector("#brands div");
+ track.innerHTML=h;
+ requestAnimationFrame(()=>{
+  const setW=track.scrollWidth||1,target=Math.max(window.innerWidth*2.2,1200);
+  let reps=2;while(reps*setW<target)reps+=2;
+  track.innerHTML=h.repeat(reps);
+ });
 }
 let S=[],cat="",kw="";
 try{S=await load("samples")}catch(e){console.warn(e)}
