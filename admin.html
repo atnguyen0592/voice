@@ -15,6 +15,9 @@ select{padding:10px;background:var(--bg);color:var(--tx);border:1px solid var(--
 .rg output{min-width:3.5em;text-align:right;color:var(--gold2);font-size:.9rem}
 .ppv-wrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:4px}
 .ppv-wrap .pic{margin:0}.ppv-wrap p{color:var(--mut);font-size:.85rem;max-width:260px}
+.bulkrow{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.chkl{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:.9rem;cursor:pointer}
+.row input[type=checkbox],.chkl input{width:17px;height:17px;accent-color:var(--gold);cursor:pointer}
 </style></head><body><div class="wrap">
 <h2 style="margin:0">Quản trị</h2><p id="msg"></p><div id="app"><button class="btn fill" id="in">Đăng nhập bằng Google</button></div></div>
 <script type="module">
@@ -25,20 +28,22 @@ const $=s=>document.querySelector(s), say=t=>($("#msg").textContent=t);
 const T={
  profile:{n:"Hồ sơ",f:[["name","Họ tên"],["role","Vai trò ngắn gọn (hiện dưới tên, vd: Voice Talent giọng nam)"],["tagline","Mô tả ngắn (hiện trong banner)"],["about","Giới thiệu","a"],
  ["photo","Ảnh chân dung","u"],
- ["photoShape","Khung ảnh","s",[["circle","Tròn"],["square","Vuông"],["rounded","Vuông bo góc"],["oval","Oval đứng"]]],
+ ["photoStyle","Hiệu ứng ảnh","s",[["normal","Bình thường (chọn khung bên dưới)"],["glass","Kính mờ (nền bokeh ấm, tan dần vào nền)"]]],
+ ["photoShape","Khung ảnh (chỉ áp dụng khi chọn Bình thường)","s",[["circle","Tròn"],["square","Vuông"],["rounded","Vuông bo góc"],["oval","Oval đứng"]]],
  ["photoX","Vị trí ngang trong khung","r",[0,100,1,"%"]],
  ["photoY","Vị trí dọc trong khung (giảm để lộ thêm phần tóc/đầu)","r",[0,100,1,"%"]],
  ["photoZoom","Phóng to / thu nhỏ ảnh","r",[70,200,5,"%"]],
  ["phone","Số điện thoại"],["zalo","Số Zalo"],["email","Email"],["facebook","Link Facebook"],["exp","Kinh nghiệm (mỗi dòng một mục)","a"],["skills","Kỹ năng - Thiết bị (mỗi dòng một mục)","a"]]},
  samples:{n:"Sample",f:[["title","Tiêu đề"],["brand","Nhãn hàng"],["category","Nhóm (vd: Trầm ấm, Game, Mẹ và bé)"],["url","Link YouTube / mp3 / mp4","u"],["cover","Ảnh bìa (bỏ trống nếu là YouTube)","u"]],row:d=>`${d.title} — ${d.brand||""} [${d.category||""}]`},
  brands:{n:"Nhãn hàng",f:[["name","Tên nhãn hàng"],["logo","Logo","u"]],row:d=>d.name}};
-let tab="profile",items=[],profileLoaded={};
+let tab="profile",items=[],profileLoaded={},selected=new Set();
+function dupData(d){const k=T[tab].f[0][0],c={...d};delete c.id;c[k]=(c[k]||"")+" (bản sao)";c.order=Date.now();c.visible=true;return c}
 async function upload(file){
  if(!CLOUDINARY.cloud)throw Error("Chưa cấu hình Cloudinary trong firebase.js");
  const fd=new FormData();fd.append("file",file);fd.append("upload_preset",CLOUDINARY.preset);
  const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloud}/auto/upload`,{method:"POST",body:fd});
  const j=await r.json();if(!j.secure_url)throw Error(j.error?.message||"Tải lên thất bại");return j.secure_url}
-const PDEF={photoShape:"circle",photoX:50,photoY:50,photoZoom:100};
+const PDEF={photoShape:"circle",photoX:50,photoY:50,photoZoom:100,photoStyle:"normal"};
 function form(c,d={},id){
  const fs=T[c].f.map(([k,l,t,extra])=>{
   const v=d[k]??PDEF[k]??"";
@@ -52,8 +57,9 @@ function form(c,d={},id){
 function updatePreview(f){
  const pv=f.querySelector("#pvPic");if(!pv)return;
  const v=Object.fromEntries(new FormData(f));
- pv.style.borderRadius=SHAPE_RADIUS[v.photoShape]||"50%";
- pv.style.aspectRatio=SHAPE_RATIO[v.photoShape]||"1/1";
+ pv.classList.toggle("glass",v.photoStyle=="glass");
+ if(v.photoStyle=="glass"){pv.style.borderRadius="18px";pv.style.aspectRatio="3/4"}
+ else{pv.style.borderRadius=SHAPE_RADIUS[v.photoShape]||"50%";pv.style.aspectRatio=SHAPE_RATIO[v.photoShape]||"1/1"}
  const img=f.querySelector("#pvImg");
  if(v.photo)img.src=v.photo;
  img.style.objectPosition=`${v.photoX||50}% ${v.photoY||50}%`;
@@ -64,22 +70,40 @@ async function render(){
  if(tab=="profile"){const d=(await getDoc(doc(db,"site","profile"))).data()||{};h+=form("profile",d);profileLoaded=d}
  else{
   items=(await getDocs(collection(db,tab))).docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
-  h+=`<button class="btn fill" data-a="new">+ Thêm ${T[tab].n.toLowerCase()}</button><div id="ed"></div><div style="margin-top:16px">`+
-  items.map((d,i)=>`<div class="row${d.visible?"":" off"}" data-id="${d.id}" data-i="${i}"><b>${esc(T[tab].row(d))}</b>
+  const ids=new Set(items.map(x=>x.id));for(const id of[...selected])if(!ids.has(id))selected.delete(id);
+  const allOn=items.length>0&&items.every(d=>selected.has(d.id));
+  h+=`<button class="btn fill" data-a="new">+ Thêm ${T[tab].n.toLowerCase()}</button><div id="ed"></div>
+  <div class="bulkrow"><label class="chkl"><input type="checkbox" id="selAll" ${allOn?"checked":""}> Chọn tất cả</label>
+  <span id="bulkActs">${selected.size?`<button class="btn" data-a="bdup">Nhân bản (${selected.size})</button><button class="btn" data-a="bdel">Xóa (${selected.size})</button>`:""}</span></div>
+  <div style="margin-top:10px">`+
+  items.map((d,i)=>`<div class="row${d.visible?"":" off"}" data-id="${d.id}" data-i="${i}">
+  <input type="checkbox" class="rowchk" data-id="${d.id}" ${selected.has(d.id)?"checked":""}>
+  <b>${esc(T[tab].row(d))}</b>
   <button class="btn" data-a="up" title="Lên">↑</button><button class="btn" data-a="dn" title="Xuống">↓</button>
-  <button class="btn" data-a="eye">${d.visible?"Đang hiện":"Đang ẩn"}</button><button class="btn" data-a="edit">Sửa</button><button class="btn" data-a="del">Xóa</button></div>`).join("")+`</div>`}
+  <button class="btn" data-a="eye">${d.visible?"Đang hiện":"Đang ẩn"}</button>
+  <button class="btn" data-a="dup" title="Nhân bản mục này">Nhân bản</button>
+  <button class="btn" data-a="edit">Sửa</button><button class="btn" data-a="del">Xóa</button></div>`).join("")+`</div>`}
  $("#app").innerHTML=h;const fm=$("#fm");if(fm&&fm.dataset.c=="profile")updatePreview(fm)}
 $("#app").addEventListener("click",async e=>{
  const b=e.target.closest("button");if(!b)return;
  try{
  if(b.id=="in")return signInWithPopup(auth,new GoogleAuthProvider());
  if(b.id=="out")return signOut(auth);
- if(b.dataset.t){tab=b.dataset.t;return render()}
+ if(b.dataset.t){tab=b.dataset.t;selected=new Set();return render()}
  if(b.id=="cancel"){$("#ed").innerHTML="";return}
  if(b.dataset.a=="new"){$("#ed").innerHTML=form(tab);return}
+ if(b.dataset.a=="bdup"){
+  say("Đang nhân bản...");
+  await Promise.all(items.filter(d=>selected.has(d.id)).map(d=>addDoc(collection(db,tab),dupData(d))));
+  selected=new Set();say(`Đã nhân bản.`);return render()}
+ if(b.dataset.a=="bdel"&&confirm(`Xóa ${selected.size} mục đã chọn? Không thể hoàn tác.`)){
+  say("Đang xóa...");
+  await Promise.all([...selected].map(id=>deleteDoc(doc(db,tab,id))));
+  selected=new Set();say("Đã xóa.");return render()}
  const r=b.closest(".row");if(!r)return;const i=+r.dataset.i,d=items[i],ref=doc(db,tab,d.id);
  if(b.dataset.a=="edit")$("#ed").innerHTML=form(tab,d,d.id);
  if(b.dataset.a=="eye"){await updateDoc(ref,{visible:!d.visible});render()}
+ if(b.dataset.a=="dup"){say("Đang nhân bản...");await addDoc(collection(db,tab),dupData(d));say("Đã nhân bản.");render()}
  if(b.dataset.a=="del"&&confirm("Xóa mục này?")){await deleteDoc(ref);render()}
  if(b.dataset.a=="up"||b.dataset.a=="dn"){
   const j=i+(b.dataset.a=="up"?-1:1);if(j<0||j>=items.length)return;
@@ -91,8 +115,13 @@ $("#app").addEventListener("input",e=>{
  if(t.matches('input[type=range]'))t.nextElementSibling.textContent=t.value+(t.dataset.unit||"");
  const f=t.closest("form");if(f&&f.dataset.c=="profile")updatePreview(f)});
 $("#app").addEventListener("change",async e=>{
- const f=e.target;if(!f.dataset.for||!f.files[0])return;
- try{say("Đang tải lên...");f.form.elements[f.dataset.for].value=await upload(f.files[0]);say("Đã tải lên. Nhớ bấm Lưu.");updatePreview(f.form)}catch(err){say("Lỗi: "+err.message)}});
+ const t=e.target;
+ if(t.id=="selAll"){selected=t.checked?new Set(items.map(x=>x.id)):new Set();return render()}
+ if(t.matches(".rowchk")){t.checked?selected.add(t.dataset.id):selected.delete(t.dataset.id);
+  $("#bulkActs").innerHTML=selected.size?`<button class="btn" data-a="bdup">Nhân bản (${selected.size})</button><button class="btn" data-a="bdel">Xóa (${selected.size})</button>`:"";
+  $("#selAll").checked=items.length>0&&items.every(d=>selected.has(d.id));return}
+ if(!t.dataset.for||!t.files[0])return;
+ try{say("Đang tải lên...");t.form.elements[t.dataset.for].value=await upload(t.files[0]);say("Đã tải lên. Nhớ bấm Lưu.");updatePreview(t.form)}catch(err){say("Lỗi: "+err.message)}});
 $("#app").addEventListener("submit",async e=>{
  e.preventDefault();const f=e.target,c=f.dataset.c,data={};
  const NUM=["photoX","photoY","photoZoom","order"];
