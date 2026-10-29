@@ -42,7 +42,7 @@ nav a:hover{background:var(--panel);color:var(--gold2)}
 .marq:hover div{animation-play-state:paused}
 .marq div{align-items:center}
 .bitem{width:210px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:0 14px}
-.blogo{width:92px;height:92px;flex:none;border-radius:50%;background:#efe4cd;border:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px;transition:width .15s,height .15s,border-radius .15s}
+.blogo{width:92px;height:92px;flex:none;border-radius:50%;background:none;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px;transition:width .15s,height .15s,border-radius .15s}
 .blogo.oval{width:176px;height:80px;border-radius:999px;padding:10px 20px}
 .blogo img{width:100%;height:100%;object-fit:contain;display:block}
 .bname{font-size:.82rem;color:var(--mut);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
