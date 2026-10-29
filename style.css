@@ -47,15 +47,15 @@ nav a:hover{background:var(--panel);color:var(--gold2)}
 .ppv .pic{max-width:140px;margin:0}
 .brandsec{border-bottom:1px solid var(--line);background:var(--bg2)}
 .brandsec .wrap{padding-top:44px}.brandsec h2{margin-bottom:6px}
-.marq{overflow:hidden;background:var(--bg2);padding:16px 0 30px}
-.marq div{display:flex;gap:46px;width:max-content;animation:m 40s linear infinite;align-items:center}
+.marq{overflow:hidden;background:var(--bg2);padding:24px 0 42px}
+.marq div{display:flex;gap:60px;width:max-content;animation:m 40s linear infinite;align-items:center}
 .marq:hover div{animation-play-state:paused}
 .bitem{flex:none;display:flex;align-items:center;justify-content:center}
-.blogo{height:66px;padding:10px 18px;border-radius:14px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;transition:transform .2s,border-color .2s,box-shadow .2s}
-.bitem:hover .blogo{transform:scale(1.07);border-color:var(--gold2);box-shadow:0 0 10px rgba(232,200,135,.95),0 0 22px rgba(232,200,135,.65),0 0 40px rgba(201,154,82,.45)}
-.blogo img{max-height:100%;max-width:200px;width:auto;height:auto;object-fit:contain;display:block;filter:drop-shadow(0 3px 10px rgba(0,0,0,.5)) saturate(1.1) contrast(1.05) brightness(1.03)}
-.bname{font-size:.82rem;color:var(--mut);white-space:nowrap}
-.bitem.noimg .bname{font:700 1.05rem "Playfair Display",serif;color:var(--gold2);white-space:normal;max-width:180px;line-height:1.3;text-align:center}
+.blogo{height:132px;padding:16px 28px;border-radius:20px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;transition:transform .2s,border-color .2s,box-shadow .2s}
+.bitem:hover .blogo{transform:scale(1.06);border-color:var(--gold2);box-shadow:0 0 12px rgba(232,200,135,.95),0 0 26px rgba(232,200,135,.65),0 0 48px rgba(201,154,82,.45)}
+.blogo img{max-height:100%;max-width:400px;width:auto;height:auto;object-fit:contain;display:block;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5)) saturate(1.1) contrast(1.05) brightness(1.03)}
+.bname{font-size:1rem;color:var(--mut);white-space:nowrap}
+.bitem.noimg .bname{font:700 1.5rem "Playfair Display",serif;color:var(--gold2);white-space:normal;max-width:260px;line-height:1.3;text-align:center}
 @keyframes m{to{transform:translateX(calc(-1 * var(--mw, 50%)))}}
 section{padding:72px 0;border-bottom:1px solid var(--line)}section:nth-of-type(even){background:var(--bg2)}
 h2{font-size:clamp(1.8rem,4vw,2.5rem);margin-bottom:32px;color:var(--gold2);display:flex;align-items:center;gap:14px}
