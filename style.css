@@ -48,9 +48,9 @@ nav a:hover{background:var(--panel);color:var(--gold2)}
 .brandsec{border-bottom:1px solid var(--line);background:var(--bg2)}
 .brandsec .wrap{padding-top:44px}.brandsec h2{margin-bottom:6px}
 .marq{overflow:hidden;background:var(--bg2);padding:24px 0 42px}
-.marq div{display:flex;gap:60px;width:max-content;animation:m 40s linear infinite;align-items:center}
-.marq:hover div{animation-play-state:paused}
-.bitem{flex:none;display:flex;align-items:center;justify-content:center}
+.marq>div{display:flex;gap:0;width:max-content;animation:m 40s linear infinite;align-items:center}
+.marq:hover>div{animation-play-state:paused}
+.bitem{flex:none;display:flex;align-items:center;justify-content:center;padding-right:60px}
 .blogo{height:132px;padding:16px 28px;border-radius:20px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;transition:transform .2s,border-color .2s,box-shadow .2s}
 .bitem:hover .blogo{transform:scale(1.06);border-color:var(--gold2);box-shadow:0 0 12px rgba(232,200,135,.95),0 0 26px rgba(232,200,135,.65),0 0 48px rgba(201,154,82,.45)}
 .blogo img{max-height:100%;max-width:400px;width:auto;height:auto;object-fit:contain;display:block;filter:drop-shadow(0 0 12px rgba(255,255,255,.55)) saturate(1.1) contrast(1.05) brightness(1.03)}
