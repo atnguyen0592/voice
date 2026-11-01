@@ -24,8 +24,8 @@
 <a href="#samples"><svg class="i"><use href="#i-hp"/></svg><span>Sample</span></a>
 <a href="#about"><svg class="i"><use href="#i-user"/></svg><span>Giới thiệu</span></a>
 <a href="#contact"><svg class="i"><use href="#i-phone"/></svg><span>Liên hệ</span></a></div></nav>
-<header class="hero"><div class="wave" id="wave"></div><div class="wrap">
-<div class="hgrid">
+<header class="hero" id="hero"><div class="wave" id="wave"></div><div class="wrap">
+<div class="hgrid" id="hgrid">
 <div class="htext">
 <h1 id="name">Nguyễn Anh Tú</h1>
 <div class="role"><svg class="i"><use href="#i-mic"/></svg><span id="role"></span></div>
@@ -33,7 +33,7 @@
 <div class="acts">
 <a class="btn fill" href="#samples"><svg class="i f"><use href="#i-play"/></svg>Nghe demo</a>
 <a class="btn" href="#contact"><svg class="i"><use href="#i-send"/></svg>Liên hệ ngay</a></div></div>
-<div class="pic" id="pic"><div class="frame"><img id="photo" alt="Nguyễn Anh Tú" hidden><div class="ph" id="ph"><svg class="i"><use href="#i-user"/></svg></div></div></div>
+<div class="pic" id="pic"><div class="aura" id="aura"></div><div class="frame"><img id="photo" alt="Nguyễn Anh Tú" hidden><div class="ph" id="ph"><svg class="i"><use href="#i-user"/></svg></div></div></div>
 </div></div></header>
 <div class="brandsec" id="brandsSec" hidden><div class="wrap"><h2><svg class="i"><use href="#i-job"/></svg>Đơn vị đã hợp tác</h2></div>
 <div class="marq" id="brands"><div></div></div></div>
@@ -62,8 +62,7 @@ $("#role").textContent=p.role;$("#tag").textContent=p.tagline;$("#about-t").text
 if(p.photo){$("#photo").src=p.photo;$("#photo").hidden=false;$("#ph").hidden=true}
 if(p.photoStyle=="glass"){
  $("#pic").classList.add("glass");
- $("#pic").style.borderRadius="18px";
- $("#pic").style.aspectRatio="3/4";
+ $("#hgrid").classList.add("glassmode");
 }else{
  $("#pic").style.borderRadius=SHAPE_RADIUS[p.photoShape]||"50%";
  $("#pic").style.aspectRatio=SHAPE_RATIO[p.photoShape]||"1/1";
