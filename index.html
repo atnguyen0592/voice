@@ -74,6 +74,25 @@ const tel=String(p.phone).replace(/\s|\./g,"");
 const L=[["phone","tel:"+tel,"Gọi điện",p.phone],["chat","https://zalo.me/"+String(p.zalo).replace(/\D/g,""),"Zalo",p.zalo],["mail","mailto:"+p.email,"Email",p.email],["fb",p.facebook,"Facebook","Nhắn tin qua Facebook"]];
 $("#ct").innerHTML=L.filter(x=>x[3]).map(x=>`<a class="ct" href="${esc(x[1])}" ${x[0]=="fb"?'target="_blank" rel="noopener"':""} aria-label="${esc(x[2])}: ${esc(x[3])}">${ic(x[0])}<span>${x[2]}</span></a>`).join("");
 let B=[];try{B=await load("brands")}catch(e){console.warn(e)}
+// Tự cắt phần viền trong suốt thừa quanh logo để các logo hiển thị cùng tỉ lệ lấp đầy khung
+const trimLogo=url=>new Promise(res=>{
+ const im=new Image();im.crossOrigin="anonymous";
+ const t=setTimeout(()=>res(url),6000);
+ im.onload=()=>{try{
+  const k=Math.min(1,800/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.max(1,Math.round(im.naturalWidth*k)),h=Math.max(1,Math.round(im.naturalHeight*k));
+  const c=document.createElement("canvas");c.width=w;c.height=h;
+  const g=c.getContext("2d",{willReadFrequently:true});g.drawImage(im,0,0,w,h);
+  const d=g.getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>10){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0||((x1-x0+1)*(y1-y0+1))/(w*h)>.92){clearTimeout(t);return res(url)} // không có viền thừa đáng kể
+  const cw=x1-x0+1,ch=y1-y0+1,o=document.createElement("canvas");o.width=cw;o.height=ch;
+  o.getContext("2d").drawImage(c,x0,y0,cw,ch,0,0,cw,ch);
+  o.toBlob(b=>{clearTimeout(t);res(b?URL.createObjectURL(b):url)},"image/png");
+ }catch(e){clearTimeout(t);res(url)}};
+ im.onerror=()=>{clearTimeout(t);res(url)};
+ im.src=url;
+});
+await Promise.all(B.map(async x=>{if(x.logo)x.logo=await trimLogo(x.logo)}));
 if(B.length){
  const h=B.map(x=>x.logo?
   `<div class="bitem"><div class="blogo"><img src="${esc(x.logo)}" alt="${esc(x.name)}"></div></div>`:
